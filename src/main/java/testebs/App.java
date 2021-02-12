@@ -7,6 +7,8 @@ import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvEntry;
+import io.github.cdimascio.dotenv.Dotenv.Filter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -163,15 +165,14 @@ class Lists {
       Document doc = Jsoup.connect(jcIndex.get("URL") + "/hmpg/hmpgLctrumTabView.do").data(postData)
           .followRedirects(true).cookies(cookies).userAgent(googleBot).ignoreContentType(true).maxBodySize(0).timeout(0)
           .header("Upgrade-Insecure-Requests", "1").post();
-      Elements elements = doc.getElementsByClass("clearfix");
       for (Element element : doc.getElementsByClass("clearfix")) {
         if (!(element.childrenSize() > 1) || element.child(1).attr("class").split(" ")[1].contains("complete"))
           continue;
         notCompleted.add(new HashMap<String, String>() {
           {
             put("new_class_status", element.child(1).attr("class").split(" ")[1]);
-            if(get("new_class_status").equals("ing")){
-              put("per",element.child(1).select(".per").text());
+            if (get("new_class_status").equals("ing")) {
+              put("per", element.child(1).select(".per").text());
             }
             put("class_tit fl", element.child(0).select(".class_name").text());
             put("class_tit", alctcr.get("name"));
@@ -180,17 +181,20 @@ class Lists {
         });
       }
     }
-    
+
   }
-  
-  protected void notifyNotCompleted(){
-    for(HashMap nC:notCompleted){
+
+  protected void notifyNotCompleted() {
+    for (HashMap nC : notCompleted) {
       System.out.println(nC);
     }
   }
 
   public static void main(String[] args) throws IOException {
-    Dotenv dotenv = Dotenv.configure().filename("env").load();
+    HashMap<String, String> dotenv = new HashMap<>();
+    for (DotenvEntry e : Dotenv.configure().load().entries(Filter.DECLARED_IN_ENV_FILE)) {
+      dotenv.put(e.getKey(), e.getValue());
+    }
     Lists test = new Lists(dotenv.get("schoolName")) {
       {
         j_username = dotenv.get("username");
@@ -201,5 +205,6 @@ class Lists {
     test.hmpgAlctcrListView();
     test.hmpgAlctcrDetailView();
     test.notifyNotCompleted();
+    return;
   }
 }
