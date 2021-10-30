@@ -25,13 +25,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
-        - name: Install Docker
+        - name: Apt Update
           run: |
             sudo apt-get update > /dev/null
             sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime 
             sudo apt-get install tzdata -y > /dev/null
             sudo dpkg-reconfigure --frontend noninteractive tzdata > /dev/null
-            sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common > /dev/null
+            sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y > /dev/null
+        - name: Install Docker
+          run: |
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
             sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /dev/null
             sudo apt-get update > /dev/null && sudo apt-get install docker-ce > /dev/null
