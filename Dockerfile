@@ -6,5 +6,5 @@ RUN ["pacman","--noconfirm","-Syu","jdk-openjdk","maven"]
 VOLUME [ "/data" ]
 WORKDIR /data
 ENV JAVA_HOME=/usr/lib/jvm/default-runtime
-RUN mvn install > /dev/null
+RUN echo $(mvn install) >> /dev/null
 CMD [ "mvn","-B","package","--file","pom.xml" ]
